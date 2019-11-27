@@ -20,7 +20,18 @@
 	2.1 Se debe obtener una licencia de prueba para APS, la cual se obtiene con un correo en la pagina de alfresco APS
 	2.3 Se agregan los archivos de licencia a la carpeta de archivos de configuración de APS (vigencia de 1 mes)
 3. Por medio del comando docker-compose up, se levantan los contenedores.
-4. Configuramos las relas de firewall(puertos,protocolos,ip), para acceder a los servicios.
+4. Habilitamos la ejecución de scripts en APS
+	-> entramos al contenedor: sudo docker container exec -it aps_process_1 /bin/bash
+	-> Ruta de scripts: /usr/local/tomcat/webapps/activiti-app/WEB-INF/classes/activiti
+	-> editamos el archivo siguiente -> whitelisted-scripts.conf
+	-> se descomenta la linea de javascript y groovy
+	-> Para editar un archivo en el container se hace con el comando *vi*
+		:w -> guarda los cambios
+		:q -> sale del archivo
+		:q! -> salir sin guardar
+		:wq -> guardar y salir
+
+5. Configuramos las reglas de firewall(puertos,protocolos,ip), para acceder a los servicios.
 
 ===================APS=====================
 http://104.198.167.252:9091/activiti-admin
