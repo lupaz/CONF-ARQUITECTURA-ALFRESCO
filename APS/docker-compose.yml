@@ -1,0 +1,46 @@
+
+version: "3.1"
+services:
+  process:
+    image: alfresco/process-services
+    environment:
+      ACTIVITI_DATASOURCE_USERNAME: alfresco
+      ACTIVITI_DATASOURCE_PASSWORD: alfresco
+      ACTIVITI_DATASOURCE_DRIVER: org.postgresql.Driver
+      ACTIVITI_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
+      ACTIVITI_DATASOURCE_URL: 'jdbc:postgresql://postgres:5432/activiti?characterEncoding=UTF-8'
+      ACTIVITI_CSRF_DISABLED: 'true'
+      ACTIVITI_CORS_ENABLED: 'true'
+      ACTIVITI_ES_SERVER_TYPE: client
+      ACTIVITI_ES_DISCOVERY_HOSTS: elasticsearch:9300
+      ACTIVITI_ES_CLUSTER_NAME: elasticsearch
+    volumes:
+      - "/home/lupaz/Docker_tests/APS/enterprise-license:/root/.activiti/enterprise-license/:ro"
+      - ./properties/activiti-app.properties:/usr/local/tomcat/lib/activiti-app.properties
+      - "/home/lupaz/Docker_tests/APS/psdataAps:/usr/local/data/"
+      - "/home/lupaz/Docker_tests/APS/enterprise-license/transform.lic:/usr/local/tomcat/lib/transform.lic"
+    ports:
+      - 9090:8080
+    links:
+      - elasticsearch:elasticsearch
+      - postgresAps:postgres
+    depends_on:
+      - elasticsearch
+      - postgresAps
+
+  elasticsearch:
+    image: elasticsearch:1.7.3
+  process-admin:
+    image: alfresco/process-services-admin
+    volumes:
+      - ./properties/activiti-admin.properties:/usr/local/tomcat/lib/activiti-admin.properties
+    ports:
+      - 9091:8080
+  postgresAps:
+    image: postgres:9.6.2
+    environment:
+      POSTGRES_DB: activiti
+      POSTGRES_USER: alfresco
+      POSTGRES_PASSWORD: alfresco
+    volumes:
+      - ./pgdataAps:/var/lib/postgresql/data

@@ -1,0 +1,82 @@
+*************************************************---------------*****************************************************
+************************************************| DOCUMENTACION |****************************************************
+*************************************************---------------*****************************************************
+
+---------------------------------------------------------------------------------------------------------------------
+------------------------------------------------ Confguración base --------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------
+
+1. creamos la instancias (VM) en la nube en este caso se utiliza Google Cloud. (todas con ubuntu trusty 16.04 LTS)
+2. configuramos las IP estaticas para nuestras isntnacias(VM)
+3. Generamos una llave publica-privada con Putty para conectarnos a las instancias (ref-1)
+4. Agregamos la llave publica a las insntancias en GC (ref-1)
+
+---------------------------------------------------------------------------------------------------------------------
+--------------------------------------------- Configuración de ACS APS(Capa lógica)----------------------------------
+---------------------------------------------------------------------------------------------------------------------
+
+1. instalación de docker y doceker compose en la instnacia (ref-2 y ref-3 )
+2. copiamos los archivos de configuración de APS y ACS a la instancia donde estarán corriendo.
+	2.1 Se debe obtener una licencia de prueba para APS, la cual se obtiene con un correo en la pagina de alfresco APS
+	2.3 Se agregan los archivos de licencia a la carpeta de archivos de configuración de APS (vigencia de 1 mes)
+3. Por medio del comando docker-compose up, se levantan los contenedores.
+4. Configuramos las relas de firewall(puertos,protocolos,ip), para acceder a los servicios.
+
+===================APS=====================
+http://104.198.167.252:9091/activiti-admin
+http://104.198.167.252:9090/activiti-app
+===================ACS=====================
+http://104.198.167.252:8080/alfresco
+http://104.198.167.252:8080/share
+
+---------------------------------------------------------------------------------------------------------------------
+----------------------------- Configuración de MS y PostgreSQL (Capa de datos y servicios) --------------------------
+---------------------------------------------------------------------------------------------------------------------
+1. Instalamos postgreSQL(ref-4)
+2. Instalamos pgAdmin (admin:admin) (ref-5)
+	-> Ingresamos a la linea de comanddo para cambiar la contraseña
+	-> sudo -u postgres psql postgres
+	-> # \password postgres
+	-> Enter new password: postgres
+
+3. Creamos el schema de la base de datos.
+4. Luego creamos la base de datos con el DDL del modelo ER
+	4.1 Comando: CREATE DATABASE ins_alfresco; 
+
+5. Instalamos git hub en las instancias  (ref-6)
+6. Recueperamos el proyecto de micro servicios (ref-12)
+7. Instalamos NPM y nodejs para la app de microservicios (ref-7)
+8. Agregamos la regla de firewall el puerto 3000 que es de la API de servicios
+9. creamos el archivo service del api rest (ref-8)
+	-> lo copiamos a la carpeta de systemd(sudo cp microServices.service  /etc/systemd/system/)
+	-> creamos el enlace de arranque(sudo systemctl enable microServices)
+	-> arrancamos el servicio (sudo systemctl start microServices)
+	-> si queremos ver la info de arranque(journalctl -u microServices)
+
+------------------------------------------------------------------------------------------------------------------
+----------------------------- Configuración de ADF (Capa de presentación) ----------------------------------------
+------------------------------------------------------------------------------------------------------------------
+
+1. En la pagina de Alfresco ADF, se encuentra una guia para crear un proyecto ADF (ref-10).
+2. Instalamos git en las instancia (ref-6)
+3. recueperamos el proyecto de micro servicios que fue cargado al repositorio de git-hub (ref-11)
+4. instalamos NPM y nodejs para la app de microservicios (ref-7)
+5. instalamos apache para correr en segundo plano el proces con PM2 (ref-9)
+
+
+*************************************************-------------*****************************************************
+************************************************| REFERENCIAS |****************************************************
+*************************************************-------------*****************************************************
+
+ref-1 = https://cloud.google.com/compute/docs/instances/connecting-to-instance#standardssh
+ref-2 = https://docs.docker.com/install/linux/docker-ce/ubuntu/
+ref-3 = https://docs.docker.com/compose/install/
+ref-4 = https://tecadmin.net/install-postgresql-server-on-ubuntu/
+ref-5 = https://tecadmin.net/install-pgadmin4-on-ubuntu/
+ref-6 = https://www.liquidweb.com/kb/install-git-ubuntu-16-04-lts/
+ref-7 = https://websiteforstudents.com/install-the-latest-node-js-and-nmp-packages-on-ubuntu-16-04-18-04-lts/ 
+ref-8 = https://www.axllent.org/docs/view/nodejs-service-with-systemd/
+ref-9 = https://www.tecmint.com/create-and-run-angular-apps-using-angular-cli-and-pm2/
+ret-10 = https://www.alfresco.com/abn/adf/docs/tutorials/creating-your-first-adf-application/ 
+ref-11 = https://github.com/lupaz/alf-ins-adf.git
+ref-12 = https://github.com/lupaz/API-REST-MODELO_INS.git
